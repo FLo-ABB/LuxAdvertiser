@@ -1,28 +1,27 @@
 # LuxAdvertiser
 
-A small DIY BLE lux + battery beacon for Home Assistant using BTHome. Built around the Seeed Studio XIAO nRF52840 :)
+A small DIY BLE lux sensor for Home Assistant using BTHome. Built around the Seeed Studio XIAO nRF52840.
 
 ## Description
 
-This project is a tiny battery-powered gadget that measures ambient light (lux) and battery level, then advertises the values over BLE using BTHome. Home Assistant can pick it up automatically, so it is super handy for quick experiments.
+This project measures ambient light with a VEML7700 and advertises the lux value over BLE using BTHome. It is intended to be powered from USB, including a simple external USB battery pack if needed, so there is no onboard battery monitoring logic to maintain.
 
 ### Gardening Use Case
 
-Made for apartment plant nerds (like me). Put it near a plant spot for a few days, collect lux history, and check if that place is actually good for the plant. You can even combine with weather data and LLM analysis for fun and better decisions.
+Made for apartment plant nerds. Put it near a plant spot, collect lux history, and check if that place is actually good for the plant. The goal is a simple sensor you can place and forget.
 
 ## Features
 
 - **Lux Measurement**: Uses a VEML7700 for ambient light readings.
-- **Battery Monitoring**: Estimates battery percentage from ADC reading.
 - **BTHome Protocol**: Works nicely with Home Assistant BLE integration.
-- **Low Power-ish**: Advertises in short bursts every 30s.
+- **Simple Power Model**: Powered over USB or an external USB battery pack.
 - **Boot LED Feedback**: Quick color flashes tell you what is working (or not).
 
 ## Hardware Requirements
 
 - Seeed Studio XIAO nRF52840
 - VEML7700 Ambient Light Sensor
-- LiPo Battery (e.g., 300mAh or larger for extended runtime)
+- USB-C power source or external USB battery pack
 - Jumper wires for connections
 
 ## Pinout
@@ -32,11 +31,9 @@ Made for apartment plant nerds (like me). Put it near a plant spot for a few day
 | Pin | Function | Connected To |
 |-----|----------|--------------|
 | 3V3 | Power Output | VEML7700 VCC |
-| GND | Ground | VEML7700 GND, Battery GND |
+| GND | Ground | VEML7700 GND |
 | D4 (P0.04) | I2C SDA | VEML7700 SDA |
 | D5 (P0.05) | I2C SCL | VEML7700 SCL |
-| P0.14 | ADC_BAT | Battery Voltage (through divider) |
-| Battery Connector | Battery Power | LiPo Battery + |
 | LED_BUILTIN (P0.26) | Status Indicator | - |
 
 ### VEML7700 Sensor
@@ -47,16 +44,6 @@ Made for apartment plant nerds (like me). Put it near a plant spot for a few day
 | GND | Ground | XIAO GND |
 | SDA | I2C Data | XIAO D4 |
 | SCL | I2C Clock | XIAO D5 |
-
-### Battery
-
-| Connection | Description |
-|------------|-------------|
-| + | Battery Connector on XIAO |
-| - | Battery Connector GND on XIAO |
-| Voltage Sense | Connected internally to P0.14 via voltage divider |
-
-**Note**: The XIAO has a built-in battery charger (BQ25101). Ensure the battery is compatible (3.7V LiPo).
 
 ## Software Setup
 
@@ -87,7 +74,7 @@ Made for apartment plant nerds (like me). Put it near a plant spot for a few day
 
 1. Enable BLE integration in Home Assistant.
 2. Power on the device; it should appear as "LuxAdvertiser".
-3. Add the BTHome device—lux and battery sensors will be auto-discovered.
+3. Add the BTHome device and the lux sensor will be auto-discovered.
 
 #### Gardening Dashboard & LLM Analysis
 - Create a dashboard with history graphs for lux over time.
@@ -103,26 +90,19 @@ Made for apartment plant nerds (like me). Put it near a plant spot for a few day
 - If BLE or sensor setup fails, the device retries initialization every 10 seconds.
 - BLE advertising starts only when **both** BLE and sensor are ready.
 - Once fully initialized, the status LED is off during normal operation.
-- Then just monitor lux and battery in Home Assistant.
-
-
-## Battery Life
-
-- **300mAh Battery**: ~11 days (advertising every 30 seconds).
-- For longer runtime (months), implement deep sleep or use a larger battery (e.g., 2000mAh for ~3 months).
+- Then just monitor lux in Home Assistant.
 
 ## Configuration
 
 - **Advertising Interval**: Modify `lastAdvertise > 30000` in `ble_manager.cpp` (in ms).
 - **Sensor Settings**: Adjust gain/integration in `lux_sensor.cpp`.
-- **Battery Divider**: Confirm ratio in `battery.cpp` (assumed 1:1).
 
 ## Troubleshooting
 
 If it acts weird, no panic, follow this quick flow :)
 
 1. Power and wiring check
-  - Confirm battery is charged and connected.
+  - Confirm the board is powered over USB.
   - Confirm VEML7700 wiring: VCC->3V3, GND->GND, SDA->D4, SCL->D5.
 2. Observe LED sequence after power-on
   - Blue once + green once: startup is successful.
@@ -136,13 +116,13 @@ If it acts weird, no panic, follow this quick flow :)
   - Advertising is intentionally blocked until sensor initialization succeeds.
 5. Check runtime behavior
   - Advertising updates every 30s by design.
-  - For battery runtime issues, reduce advertising frequency or add deep sleep.
+  - For longer unattended runtime, use a larger external USB battery pack or reduce advertising frequency.
 
 ### Symptom Table
 
 | Symptom | Likely Cause | Action |
 |---------|--------------|--------|
-| No LED activity | No power/boot issue | Check battery, USB power, board seating |
+| No LED activity | No power/boot issue | Check USB power and board seating |
 | Red flash at boot | BLE or sensor init failed | Recheck wiring and reboot |
 | Red flash every 10s | Startup retry still failing | Verify VEML7700 power/I2C and BLE environment |
 | Not visible in Home Assistant | HA-side BLE issue | Test with nRF Connect, then check HA BLE integration |

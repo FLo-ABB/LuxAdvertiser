@@ -1,7 +1,6 @@
 #include "ble_manager.h"
 #include <ArduinoBLE.h>
 #include "lux_sensor.h"
-#include "battery.h"
 #include "debug.h"
 
 // BTHome service UUID
@@ -31,61 +30,39 @@ static void buildPlaceholderBTHomeData() {
   adv_data[0] = 0xD2;
   adv_data[1] = 0xFC;
   adv_data[2] = 0x40;
-  adv_data[3] = 0x01;
-  adv_data[4] = 0;       // battery = 0%
-  adv_data[5] = 0x16;
-  adv_data[6] = 0;       // charging = 0 (not charging)
-  adv_data[7] = 0x05;
-  adv_data[8] = 0;       // lux high
-  adv_data[9] = 0;       // lux mid
-  adv_data[10] = 0;      // lux low
-  adv_data_len = 11;
+  adv_data[3] = 0x05;
+  adv_data[4] = 0;
+  adv_data[5] = 0;
+  adv_data[6] = 0;
+  adv_data_len = 7;
 }
 
 void buildBTHomeData() {
   DBG_PRINTLN("[ble] buildBTHomeData: getLuxValue()");
   uint16_t lux = getLuxValue();
 
-  DBG_PRINTLN("[ble] buildBTHomeData: getBatteryLevel()");
-  uint8_t battery = getBatteryLevel();
-
   DBG_PRINTLN("[ble] buildBTHomeData: pack payload");
 
   uint32_t luxScaled = (uint32_t)lux * 100U;
 
-  // Check if device is USB powered (charging)
-  static bool vbusPinInitialized = false;
-  if (!vbusPinInitialized) {
-    pinMode(32, INPUT);  // VBUS pin
-    vbusPinInitialized = true;
-  }
-  uint8_t isCharging = digitalRead(32) == HIGH ? 1 : 0;
-
   // BTHome v2 payload format:
-  // [UUID: 0xFCD2] [Info: 0x40] [0x01: battery %] [0x16: charging] [0x05: lux]
-  adv_data[0] = 0xD2;          // UUID low byte
-  adv_data[1] = 0xFC;          // UUID high byte
-  adv_data[2] = 0x40;          // Device info (unencrypted, regular, v2)
-  adv_data[3] = 0x01;          // Object ID: Battery level
-  adv_data[4] = battery;        // Battery percentage
-  adv_data[5] = 0x16;          // Object ID: Battery charging status
-  adv_data[6] = isCharging;    // 0=not charging, 1=charging
-  adv_data[7] = 0x05;          // Object ID: Illuminance
-  adv_data[8] = (uint8_t)(luxScaled & 0xFF);
-  adv_data[9] = (uint8_t)((luxScaled >> 8) & 0xFF);
-  adv_data[10] = (uint8_t)((luxScaled >> 16) & 0xFF);
+  // [UUID: 0xFCD2] [Info: 0x40] [0x05: lux]
+  adv_data[0] = 0xD2;
+  adv_data[1] = 0xFC;
+  adv_data[2] = 0x40;
+  adv_data[3] = 0x05;
+  adv_data[4] = (uint8_t)(luxScaled & 0xFF);
+  adv_data[5] = (uint8_t)((luxScaled >> 8) & 0xFF);
+  adv_data[6] = (uint8_t)((luxScaled >> 16) & 0xFF);
 
-  adv_data_len = 11;
+  adv_data_len = 7;
   
   if (DEBUG_ENABLED) {
     DBG_PRINT("[ble] lux=");
     Serial.print(lux);
     Serial.print(" luxScaled=");
     Serial.print(luxScaled);
-    Serial.print(" battery=");
-    Serial.print(battery);
-    Serial.print(" charging=");
-    Serial.println(isCharging);
+    Serial.println();
     debugPrintHex("[ble] payload:", adv_data, adv_data_len);
   }
   
