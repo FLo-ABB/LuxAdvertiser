@@ -52,11 +52,11 @@ The enclosure was designed in OnShape and is intended to be 3D printed.
 
 ## 📸 In Situ Photography
 
-Placeholder: add an in situ photo of the assembled device in its real placement.
+![LuxAdvertiser in situ](https://raw.githubusercontent.com/FLo-ABB/LuxAdvertiser/main/img/insitu.jpg)
 
 ## 📈 Home Assistant Chart
 
-Placeholder: add a screenshot of the Home Assistant lux history chart.
+![Home Assistant lux history chart](https://raw.githubusercontent.com/FLo-ABB/LuxAdvertiser/main/img/HA_chart.PNG)
 
 ## 📌 Pinout
 
