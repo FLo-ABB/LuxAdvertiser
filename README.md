@@ -17,7 +17,9 @@ It is designed to be simple and practical:
 
 ### 🌱 Gardening Use Case
 
-Put it near a plant spot, collect lux history, and verify if that location is actually good for your plant. The goal is a tiny sensor you can place and use remotely.
+Put it near a plant spot, collect lux history, and verify if that location is actually good for your plant. The goal is a tiny sensor you can place and use remotely on Home Assistant's dashboard.
+
+ ![LuxAdvertiser in situ](img/insitu.jpg) ![Home Assistant lux history chart](img/HA_chart.PNG)
 
 ## 🚀 Features
 
@@ -37,26 +39,19 @@ Put it near a plant spot, collect lux history, and verify if that location is ac
 
 - 1x M2x10 screw
 - 1x M2 heat insert
-
-## 🔌 Wiring Diagram
-
-![LuxAdvertiser wiring diagram](img/wiring.png)
+- 1x 3D printed enclosure (see below)
+- 1x Seeed Studio XIAO nRF52840
+- 1x VEML7700 Ambient Light Sensor
+- Wires for I2C and power connections
 
 ## 🖨️ 3D Enclosure
 
-![LuxAdvertiser 3D enclosure](img/3dEnclosure.PNG)
-
 The enclosure was designed in OnShape and is intended to be 3D printed.
+
+![LuxAdvertiser 3D enclosure](img/3dEnclosure.PNG)
 
 [OnShape Model](https://cad.onshape.com/documents/a6520b5bcc45139a07dec6a0/w/8785962cd5c47eca463f3edf/e/562fdbec90560b909e2e8cf4?renderMode=3&uiState=69d23bb86be0f977970a4154) 
 
-## 📸 In Situ Photography
-
-![LuxAdvertiser in situ](img/insitu.jpg)
-
-## 📈 Home Assistant Chart
-
-![Home Assistant lux history chart](img/HA_chart.PNG)
 
 ## 📌 Pinout
 
@@ -69,6 +64,8 @@ The enclosure was designed in OnShape and is intended to be 3D printed.
 | D4 (P0.04) | I2C SDA | SDA |
 | D5 (P0.05) | I2C SCL | SCL |
 | LED_BUILTIN (P0.26) | Status Indicator | - |
+
+![LuxAdvertiser wiring diagram](img/wiring.png)
 
 
 ## 💻 Software Setup
@@ -99,12 +96,6 @@ The enclosure was designed in OnShape and is intended to be 3D printed.
 2. Power on the device. It should appear as **LuxAdvertiser**.
 3. Add the BTHome device. The lux sensor should be auto-discovered.
 
-#### 🌤️ Optional Dashboard Ideas
-
-- Create a chart card with lux history over time.
-- Add weather data (e.g., OpenWeatherMap) for context.
-- Use HA automation/scripts to ask an LLM for plant-light recommendations.
-
 ## ▶️ Usage
 
 - On power-up, the device runs a boot sequence:
@@ -113,12 +104,7 @@ The enclosure was designed in OnShape and is intended to be 3D printed.
   - **Red flash (once)**: BLE or sensor setup failed for that attempt.
 - If BLE or sensor setup fails, initialization retries every 10 seconds.
 - BLE advertising starts only when **both** BLE and sensor are ready.
-- Once fully initialized, the status LED is off during normal operation.
-
-## ⚙️ Configuration
-
-- **Advertising interval**: edit `lastAdvertise > 30000` in `src/ble_manager.cpp` (milliseconds).
-- **Sensor settings**: adjust gain/integration in `src/lux_sensor.cpp`.
+- Once fully initialized, the status LED is off during normal operation (saving power).
 
 ## 🧯 Troubleshooting
 
@@ -139,17 +125,6 @@ If it acts weird, no panic, follow this flow.
   - Advertising is intentionally blocked until sensor initialization succeeds.
 5. **Check runtime behavior**
   - Advertising updates every 30s by design.
-  - For longer unattended runtime, use a larger USB battery pack or reduce advertising frequency.
-
-### Symptom Table
-
-| Symptom | Likely Cause | Action |
-|---------|--------------|--------|
-| No LED activity | No power/boot issue | Check USB power and board seating |
-| Red flash at boot | BLE or sensor init failed | Recheck wiring and reboot |
-| Red flash every 10s | Startup retry still failing | Verify VEML7700 power/I2C and BLE environment |
-| Not visible in Home Assistant | HA-side BLE issue | Test with nRF Connect, then check HA BLE integration |
-| Visible in BLE but wrong/no data | Sensor not ready or invalid reading | Confirm green flash and sensor wiring |
 
 ## 🤝 Contributing
 
@@ -168,6 +143,10 @@ Released under the MIT License. See [LICENSE](./LICENSE).
 ## 🙏 Acknowledgments
 
 - BTHome protocol: https://bthome.io/
-- ArduinoBLE library
-- Adafruit VEML7700 library
+- BTHome format and examples: https://bthome.io/format/
+- Home Assistant Bluetooth integration docs: https://www.home-assistant.io/integrations/bluetooth/
+- Home Assistant BTHome integration docs: https://www.home-assistant.io/integrations/bthome/
 - Seeed Studio XIAO nRF52840 documentation: https://wiki.seeedstudio.com/XIAO_BLE/
+- Adafruit VEML7700 sensor guide: https://learn.adafruit.com/adafruit-veml7700
+- ArduinoBLE library reference: https://www.arduino.cc/reference/en/libraries/arduinoble/
+- Adafruit VEML7700 Arduino library: https://github.com/adafruit/Adafruit_VEML7700
