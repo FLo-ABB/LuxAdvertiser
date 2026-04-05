@@ -40,11 +40,11 @@ Put it near a plant spot, collect lux history, and verify if that location is ac
 
 ## 🔌 Wiring Diagram
 
-![LuxAdvertiser wiring diagram](https://raw.githubusercontent.com/FLo-ABB/LuxAdvertiser/main/img/wiring.png)
+![LuxAdvertiser wiring diagram](img/wiring.png)
 
 ## 🖨️ 3D Enclosure
 
-![LuxAdvertiser 3D enclosure](https://raw.githubusercontent.com/FLo-ABB/LuxAdvertiser/main/img/3dEnclosure.PNG)
+![LuxAdvertiser 3D enclosure](img/3dEnclosure.PNG)
 
 The enclosure was designed in OnShape and is intended to be 3D printed.
 
@@ -52,11 +52,11 @@ The enclosure was designed in OnShape and is intended to be 3D printed.
 
 ## 📸 In Situ Photography
 
-![LuxAdvertiser in situ](https://raw.githubusercontent.com/FLo-ABB/LuxAdvertiser/main/img/insitu.jpg)
+![LuxAdvertiser in situ](img/insitu.jpg)
 
 ## 📈 Home Assistant Chart
 
-![Home Assistant lux history chart](https://raw.githubusercontent.com/FLo-ABB/LuxAdvertiser/main/img/HA_chart.PNG)
+![Home Assistant lux history chart](img/HA_chart.PNG)
 
 ## 📌 Pinout
 
